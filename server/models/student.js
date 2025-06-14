@@ -27,7 +27,12 @@ const contestSchema = new mongoose.Schema({
 
 const studentSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { 
+        type: String, 
+        unique: true, 
+        sparse: true,
+        default: null
+    },
     phone: String,
     codeforcesHandle: { type: String, required: true, unique: true },
     currentRating: { type: Number, default: 0 },
@@ -38,5 +43,9 @@ const studentSchema = new mongoose.Schema({
     reminderSentCount: { type: Number, default: 0 },
     disableEmail: { type: Boolean, default: false }
 });
+
+// Drop existing indexes to avoid conflicts
+studentSchema.index({ email: 1 }, { unique: true, sparse: true });
+studentSchema.index({ codeforcesHandle: 1 }, { unique: true });
 
 module.exports = mongoose.model('Student', studentSchema);

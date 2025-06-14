@@ -292,3 +292,81 @@ form input:focus {
         padding: 1rem;
     }
 }
+
+/* src/App.css - Additions */
+
+.profile-container {
+    width: 80%;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.profile-section {
+    margin-top: 2.5rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.back-button {
+    background-color: #7f8c8d;
+    margin-bottom: 1rem;
+}
+.back-button:hover {
+    background-color: #6c7a7b;
+}
+
+.filter-buttons {
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 10px;
+}
+.filter-buttons button {
+    background-color: #ecf0f1;
+    color: #333;
+}
+.filter-buttons button.active {
+    background-color: #3498db;
+    color: white;
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+.stat-card h4 {
+    margin-top: 0;
+    color: #3498db;
+}
+.stat-card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+/* Heatmap Customization */
+.heatmap-container {
+    padding: 1rem;
+}
+.react-calendar-heatmap .color-github-0 { fill: #ebedf0; }
+.react-calendar-heatmap .color-github-1 { fill: #9be9a8; }
+.react-calendar-heatmap .color-github-2 { fill: #40c463; }
+.react-calendar-heatmap .color-github-3 { fill: #30a14e; }
+.react-calendar-heatmap .color-github-4 { fill: #216e39; }

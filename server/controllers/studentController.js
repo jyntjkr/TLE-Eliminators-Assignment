@@ -5,30 +5,71 @@ const { getCodeforcesData } = require('./codeforcesController');
 // Create a new student and fetch initial data
 exports.createStudent = async (req, res) => {
     console.log('Creating student with data:', req.body);
+    const session = await Student.startSession();
+    session.startTransaction();
+    
     try {
-        const existingStudent = await Student.findOne({ $or: [{ email: req.body.email }, { codeforcesHandle: req.body.codeforcesHandle }] });
+        // First check if student exists
+        const existingStudent = await Student.findOne({ 
+            $or: [
+                { email: req.body.email }, 
+                { codeforcesHandle: req.body.codeforcesHandle }
+            ] 
+        }).session(session);
+        
         if (existingStudent) {
             console.log('Student already exists:', existingStudent);
-            return res.status(409).send({ message: 'A student with this email or Codeforces handle already exists.' });
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(409).send({ 
+                message: 'A student with this email or Codeforces handle already exists.' 
+            });
         }
-        
-        const student = new Student(req.body);
-        console.log('Attempting to fetch Codeforces data for handle:', student.codeforcesHandle);
+
+        // Create new student with basic info
+        const student = new Student({
+            name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone,
+            codeforcesHandle: req.body.codeforcesHandle
+        });
+
         try {
-            // Fetch data immediately
+            // Fetch Codeforces data
+            console.log('Fetching Codeforces data for:', student.codeforcesHandle);
             const initialData = await getCodeforcesData(student.codeforcesHandle);
-            console.log('Successfully fetched Codeforces data:', initialData);
+            console.log('Received Codeforces data:', initialData);
+            
+            // Update student with Codeforces data
             Object.assign(student, initialData);
-            await student.save();
+            
+            // Save the complete student record
+            await student.save({ session });
+            await session.commitTransaction();
+            session.endSession();
+            
             console.log('Student saved successfully:', student);
             res.status(201).send(student);
         } catch (error) {
             console.error('Error fetching Codeforces data:', error);
-            return res.status(404).send({ message: error.message });
+            // If Codeforces data fetch fails, still save the basic student info
+            await student.save({ session });
+            await session.commitTransaction();
+            session.endSession();
+            
+            res.status(201).send({
+                ...student.toObject(),
+                message: 'Student created but Codeforces data could not be fetched. Will be updated on next sync.'
+            });
         }
     } catch (error) {
         console.error('Error in createStudent:', error);
-        res.status(500).send({ message: 'Error creating student.', error: error.message });
+        await session.abortTransaction();
+        session.endSession();
+        res.status(500).send({ 
+            message: 'Error creating student.', 
+            error: error.message 
+        });
     }
 };
 

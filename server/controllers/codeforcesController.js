@@ -40,13 +40,7 @@ const fetchCodeforcesData = async (handle) => {
             lastUpdated: new Date()
         };
 
-        // Use upsert to create if doesn't exist
-        await Student.findOneAndUpdate(
-            { codeforcesHandle: handle },
-            data,
-            { upsert: true, new: true }
-        );
-
+        console.log('Successfully fetched Codeforces data:', data);
         return data;
     } catch (error) {
         console.error('Error in fetchCodeforcesData:', error);
