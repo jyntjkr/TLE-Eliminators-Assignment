@@ -123,13 +123,15 @@ const StudentTable = () => {
     return (
         <div className="student-table-container">
             <div className="table-header">
-                <h2>Students</h2>
-                <div className="table-actions">
-                    <button onClick={() => setIsModalOpen(true)} className="add-btn">
-                        <i className="fas fa-plus"></i> Add Student
+                <h2>Student Data</h2>
+                <div className="header-actions">
+                    <button className="add-btn" onClick={() => setIsModalOpen(true)}>
+                        <i className="fas fa-plus"></i>
+                        <span className="button-text">Add Student</span>
                     </button>
-                    <button onClick={downloadCSV} className="download-btn">
-                        <i className="fas fa-download"></i> Download CSV
+                    <button className="download-btn" onClick={downloadCSV}>
+                        <i className="fas fa-download"></i>
+                        <span className="button-text">Download</span>
                     </button>
                 </div>
             </div>
@@ -177,6 +179,44 @@ const StudentTable = () => {
                     <StudentForm student={editingStudent} onSave={handleSaveStudent} onCancel={() => { setIsModalOpen(false); setEditingStudent(null); }}/>
                 </Modal>
             )}
+            <style jsx>{`
+                .table-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                }
+
+                .header-actions {
+                    display: flex;
+                    gap: 1rem;
+                }
+
+                .add-btn, .download-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .button-text {
+                    display: inline;
+                }
+
+                @media (max-width: 768px) {
+                    .button-text {
+                        display: none;
+                    }
+
+                    .add-btn, .download-btn {
+                        padding: 0.5rem;
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

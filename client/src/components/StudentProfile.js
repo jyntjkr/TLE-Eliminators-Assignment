@@ -187,7 +187,16 @@ const StudentProfile = () => {
                         </div>
                     )}
                 </div>
-                <div className="chart-container" style={{height: '400px'}}>
+                <div className="chart-container" style={{
+                    height: '400px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    maxWidth: '800px',
+                    margin: '0 auto',
+                    padding: '1rem'
+                }}>
                     {filteredContests.length > 0 ? (
                         <Line 
                             data={{
@@ -205,6 +214,7 @@ const StudentProfile = () => {
                             }}
                             options={{
                                 responsive: true,
+                                maintainAspectRatio: false,
                                 plugins: {
                                     legend: {
                                         position: 'top',
@@ -425,10 +435,9 @@ const StudentProfile = () => {
                 }
 
                 .chart-container {
-                    aspect-ratio: 21/9;
-                    width: 100%;
-                    max-width: 900px;
-                    margin: 0 auto 2rem auto;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    margin: 1rem auto;
                 }
 
                 .stats-grid {
@@ -557,6 +566,11 @@ const StudentProfile = () => {
                     .problem-link {
                         padding: 0.125rem 0.25rem;
                         font-size: 0.75rem;
+                    }
+
+                    .chart-container {
+                        height: 300px;
+                        padding: 0.5rem;
                     }
                 }
             `}</style>
