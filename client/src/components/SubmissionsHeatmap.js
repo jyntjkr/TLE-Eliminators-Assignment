@@ -78,7 +78,7 @@ const SubmissionsHeatmap = ({ submissions }) => {
         
         :global(.react-calendar-heatmap rect) {
           rx: 1.5px;
-          stroke: #f4f7f9;
+          stroke: var(--bg-color);
           stroke-width: 1px;
           height: 10px;
           width: 10px;
@@ -86,30 +86,38 @@ const SubmissionsHeatmap = ({ submissions }) => {
 
         :global(.react-calendar-heatmap .react-calendar-heatmap-month-labels) {
           font-size: 11px;
-          color: #767676;
+          color: var(--text-color);
         }
         
         :global(.react-calendar-heatmap .react-calendar-heatmap-weekday-labels) {
           font-size: 10px;
-          color: #767676;
+          color: var(--text-color);
         }
 
         :global(.react-calendar-heatmap-month-label) {
-          fill: #767676;
+          fill: var(--text-color);
           font-size: 10px;
         }
 
         :global(.react-calendar-heatmap-weekday-label) {
-          fill: #767676;
+          fill: var(--text-color);
           font-size: 9px;
         }
 
-        :global(.color-github-0) { fill: #ebedf0; }
+        /* Use different colors for empty cells in dark mode */
+        :global(.app.dark-mode .color-github-0),
+        :global(.app.dark-mode .color-empty) { 
+          fill: #1b1b1b; 
+        }
+        
+        :global(.color-github-0), 
+        :global(.color-empty) { 
+          fill: #ebedf0; 
+        }
         :global(.color-github-1) { fill: #9be9a8; }
         :global(.color-github-2) { fill: #40c463; }
         :global(.color-github-3) { fill: #30a14e; }
         :global(.color-github-4) { fill: #216e39; }
-        :global(.color-empty) { fill: #ebedf0; }
 
         /* Mobile specific styles */
         @media screen and (max-width: 768px) {

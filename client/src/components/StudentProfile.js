@@ -249,16 +249,16 @@ const StudentProfile = () => {
                     )}
                 </div>
                 <div className="chart-container" style={{
-                    height: '500px', // Increased from 400px
+                    height: '500px',
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '100%',
-                    maxWidth: '1000px', // Increased from 800px
+                    maxWidth: '1000px',
                     margin: '0 auto',
-                    padding: '1.5rem', // Increased padding for more space
+                    padding: '1.5rem',
                     boxSizing: 'border-box',
-                    overflowX: 'hidden' // Prevent horizontal overflow
+                    overflowX: 'hidden'
                 }}>
                     {filteredContests.length > 0 ? (
                         <Line 
@@ -270,7 +270,8 @@ const StudentProfile = () => {
                                     {
                                         label: 'Rating',
                                         data: filteredContests.map(c => c.newRating),
-                                        borderColor: 'rgb(75, 192, 192)',
+                                        borderColor: 'rgba(153, 102, 255, 0.8)',
+                                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
                                         tension: 0.1
                                     }
                                 ]
@@ -293,6 +294,14 @@ const StudentProfile = () => {
                                         title: {
                                             display: true,
                                             text: 'Rating'
+                                        },
+                                        grid: {
+                                            color: 'rgba(153, 102, 255, 0.1)'
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            color: 'rgba(153, 102, 255, 0.05)'
                                         }
                                     }
                                 }
@@ -469,6 +478,8 @@ const StudentProfile = () => {
                     max-width: 100%;
                     margin: 0;
                     box-sizing: border-box;
+                    background-color: var(--bg-color);
+                    color: var(--text-color);
                 }
 
                 .back-button {
@@ -495,7 +506,7 @@ const StudentProfile = () => {
                 }
 
                 .filter-buttons button {
-                    background: white;
+                    background: var(--card-bg);
                     color: ${PRIMARY_BLUE};
                     border: 2px solid ${PRIMARY_BLUE};
                     padding: 0.5rem 1rem;
@@ -519,23 +530,39 @@ const StudentProfile = () => {
                     border: 2px solid ${PRIMARY_BLUE};
                     border-radius: 8px;
                     color: ${PRIMARY_BLUE};
-                    background: white;
+                    background: var(--card-bg);
                     font-size: 0.9rem;
                     cursor: pointer;
                 }
 
+                .profile-section {
+                    background: var(--card-bg);
+                    padding: 2rem;
+                    border-radius: 8px;
+                    margin-bottom: 2rem;
+                    box-shadow: 0 4px 8px var(--shadow-color);
+                    color: var(--text-color);
+                }
+
+                .profile-section h3 {
+                    color: var(--primary-blue);
+                    margin-bottom: 1.5rem;
+                }
+
                 .chart-container {
-                    height: 500px; // Update this to match the inline style
+                    height: 500px;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     width: 100%;
                     margin: 0 auto;
                     padding: 1.5rem;
-                    background-color: #fafafa; // Lighter background to make the chart stand out
+                    background-color: var(--bg-color); /* Use dark mode bg color */
                     box-sizing: border-box;
                     overflow-x: hidden; /* Prevent horizontal overflow */
                     position: relative;
+                    border-radius: 8px;
+                    border: 1px solid var(--border-color);
                 }
 
                 .stats-grid {
@@ -546,14 +573,15 @@ const StudentProfile = () => {
                 }
 
                 .stat-card {
-                    background: white;
+                    background: var(--card-bg);
                     padding: 1.5rem;
                     border-radius: 12px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    box-shadow: 0 2px 4px var(--shadow-color);
+                    color: var(--text-color);
                 }
 
                 .stat-card h4 {
-                    color: ${PRIMARY_BLUE};
+                    color: var(--primary-blue);
                     margin: 0 0 0.5rem 0;
                     font-size: 0.9rem;
                     text-transform: uppercase;
@@ -575,23 +603,33 @@ const StudentProfile = () => {
                     width: 100%;
                     border-collapse: collapse;
                     margin-top: 1rem;
+                    color: var(--text-color);
                 }
 
                 .contests-table th,
                 .contests-table td {
                     padding: 0.75rem;
                     text-align: left;
-                    border-bottom: 1px solid #eee;
+                    border-bottom: 1px solid var(--border-color);
                 }
 
                 .contests-table th {
-                    background-color: var(--dark-blue, rgb(3, 11, 46));
-                    color: white;
+                    background-color: var(--table-header-bg);
+                    color: var(--table-header-color);
                     font-weight: 600;
                 }
 
                 .contests-table tr:hover {
-                    background-color: #f8f9fa;
+                    background-color: var(--table-row-hover);
+                }
+
+                .contests-table a {
+                    color: var(--primary-blue);
+                    text-decoration: none;
+                }
+
+                .contests-table a:hover {
+                    text-decoration: underline;
                 }
 
                 .positive {
@@ -611,26 +649,28 @@ const StudentProfile = () => {
                 .problem-link {
                     display: inline-block;
                     padding: 0.25rem 0.5rem;
-                    background-color: #f8f9fa;
+                    background-color: var(--bg-color);
                     border-radius: 4px;
-                    color: #495057;
+                    color: var(--text-color);
                     text-decoration: none;
                     font-size: 0.875rem;
+                    border: 1px solid var(--border-color);
                 }
 
                 .problem-link:hover {
-                    background-color: #e9ecef;
+                    background-color: var(--table-row-hover);
                 }
 
                 .reminder-settings {
-                    background: white;
+                    background: var(--card-bg);
                     padding: 1rem;
                     border-radius: 8px;
                     margin: 1rem 0;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0 2px 4px var(--shadow-color);
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                    color: var(--text-color);
                 }
 
                 .reminder-info {
@@ -640,7 +680,7 @@ const StudentProfile = () => {
 
                 .reminder-info p {
                     margin: 0;
-                    color: #666;
+                    color: var(--text-color);
                 }
 
                 .reminder-toggle {
@@ -696,7 +736,7 @@ const StudentProfile = () => {
 
                 .toggle-label {
                     font-size: 0.9rem;
-                    color: #666;
+                    color: var(--text-color);
                 }
 
                 @media (max-width: 768px) {

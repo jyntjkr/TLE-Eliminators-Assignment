@@ -30,7 +30,7 @@ const AddStudentModal = ({ onSave, onCancel }) => {
                     <input name="codeforcesHandle" value={formData.codeforcesHandle} onChange={handleChange} placeholder="Codeforces Handle" required />
                     <div className="form-actions">
                         <button type="submit">Save Student</button>
-                        <button type="button" onClick={onCancel}>Cancel</button>
+                        <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
                     </div>
                 </form>
             </div>

@@ -13,10 +13,12 @@
  * - Status feedback for sync operations
  * - Responsive design
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { ThemeContext } from '../App';
 
 const SyncSettings = () => {
+    const { isDarkMode } = useContext(ThemeContext);
     // State management for sync settings and UI controls
     const [settings, setSettings] = useState({
         cronTime: '0 2 * * *',  // Default: 2 AM daily
@@ -92,7 +94,7 @@ const SyncSettings = () => {
         setSettings(prev => ({ ...prev, isEnabled: !prev.isEnabled }));
     };
 
-    if (loading) return <div>Loading settings...</div>;
+    if (loading) return <div className="loading">Loading settings...</div>;
 
     // Convert cron time to 24-hour format for input
     const [minutes, hours] = settings.cronTime.split(' ');
@@ -141,13 +143,17 @@ const SyncSettings = () => {
 
                 <div className="form-group">
                     <label className="toggle-label">
-                        Enable Sync:
-                        <input
-                            type="checkbox"
-                            checked={settings.isEnabled}
-                            onChange={handleToggle}
-                        />
-                        <span className="toggle-slider"></span>
+                        <span className="toggle-text">Automatic Sync</span>
+                        <div className="toggle-description">Enable or disable automatic synchronization of student data</div>
+                        <div className="toggle-container">
+                            <input
+                                type="checkbox"
+                                checked={settings.isEnabled}
+                                onChange={handleToggle}
+                                className="toggle-input"
+                            />
+                            <span className="toggle-slider"></span>
+                        </div>
                     </label>
                 </div>
 
@@ -156,22 +162,19 @@ const SyncSettings = () => {
                         {loading ? 'Saving...' : 'Save Settings'}
                     </button>
                 </div>
-
-                {message && (
-                    <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
-                        {message}
-                    </div>
-                )}
             </form>
+
+            {message && <div className="message">{message}</div>}
 
             <style jsx>{`
                 .sync-settings {
                     max-width: 600px;
                     margin: 2rem auto;
                     padding: 2rem;
-                    background: white;
+                    background: var(--card-bg);
                     border-radius: 8px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0 2px 4px var(--shadow-color);
+                    color: var(--text-color);
                 }
 
                 .header-section {
@@ -181,38 +184,66 @@ const SyncSettings = () => {
                     margin-bottom: 2rem;
                 }
 
-                h2 {
+                .header-section h2 {
                     margin: 0;
-                    color: #333;
+                    color: var(--text-color);
                 }
 
                 .form-group {
                     margin-bottom: 1.5rem;
                 }
 
-                label {
+                .form-group label {
                     display: block;
                     margin-bottom: 0.5rem;
-                    color: #555;
+                    color: var(--text-color);
                 }
 
-                input[type="time"],
-                select {
+                .form-group input[type="time"],
+                .form-group select {
                     width: 100%;
-                    padding: 0.5rem;
-                    border: 1px solid #ddd;
+                    padding: 0.75rem;
+                    border: 1px solid var(--input-border);
                     border-radius: 4px;
+                    background-color: var(--input-bg);
+                    color: var(--text-color);
                     font-size: 1rem;
+                }
+
+                .form-group input[type="time"]:disabled,
+                .form-group select:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
                 }
 
                 .toggle-label {
                     display: flex;
-                    align-items: center;
-                    cursor: pointer;
+                    flex-direction: column;
+                    gap: 0.5rem;
                 }
 
-                input[type="checkbox"] {
-                    display: none;
+                .toggle-text {
+                    font-weight: 500;
+                    color: var(--text-color);
+                }
+
+                .toggle-description {
+                    font-size: 0.875rem;
+                    color: var(--text-color);
+                    opacity: 0.8;
+                }
+
+                .toggle-container {
+                    position: relative;
+                    display: inline-block;
+                    margin-top: 0.5rem;
+                }
+
+                .toggle-input {
+                    position: absolute;
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
                 }
 
                 .toggle-slider {
@@ -222,90 +253,75 @@ const SyncSettings = () => {
                     height: 24px;
                     background-color: #ccc;
                     border-radius: 12px;
-                    margin-left: 1rem;
-                    transition: 0.4s;
+                    transition: 0.3s;
                 }
 
                 .toggle-slider:before {
                     content: "";
                     position: absolute;
-                    height: 16px;
-                    width: 16px;
-                    left: 4px;
-                    bottom: 4px;
+                    height: 20px;
+                    width: 20px;
+                    left: 2px;
+                    bottom: 2px;
                     background-color: white;
                     border-radius: 50%;
-                    transition: 0.4s;
+                    transition: 0.3s;
                 }
 
-                input[type="checkbox"]:checked + .toggle-slider {
+                .toggle-input:checked + .toggle-slider {
                     background-color: var(--primary-blue);
                 }
 
-                input[type="checkbox"]:checked + .toggle-slider:before {
+                .toggle-input:checked + .toggle-slider:before {
                     transform: translateX(26px);
                 }
 
                 .button-container {
                     display: flex;
-                    justify-content: flex-start;
-                    margin-top: 1rem;
+                    justify-content: flex-end;
+                    margin-top: 2rem;
                 }
 
                 .action-button {
-                    padding: 0.5rem 1rem;
-                    border: none;
-                    border-radius: 4px;
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    background-color: #4a90e2;
+                    background-color: var(--primary-blue);
                     color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    transition: background-color 0.2s;
                     min-width: 120px;
-                    justify-content: center;
                 }
 
                 .action-button:hover {
-                    background-color: #357abd;
+                    background-color: var(--primary-blue-hover);
                 }
 
                 .action-button:disabled {
-                    background-color: #ccc;
+                    opacity: 0.7;
                     cursor: not-allowed;
-                }
-
-                .sync-button {
-                    background-color: #4CAF50;
-                }
-
-                .sync-button:hover {
-                    background-color: #45a049;
                 }
 
                 .message {
                     margin-top: 1rem;
-                    padding: 0.75rem;
+                    padding: 1rem;
                     border-radius: 4px;
+                    background-color: var(--card-bg);
+                    color: var(--text-color);
                     text-align: center;
                 }
 
-                .message.success {
-                    background-color: #e8f5e9;
-                    color: #2e7d32;
-                }
-
-                .message.error {
-                    background-color: #ffebee;
-                    color: #c62828;
+                .loading {
+                    text-align: center;
+                    padding: 2rem;
+                    color: var(--text-color);
                 }
 
                 @media (max-width: 768px) {
                     .sync-settings {
                         margin: 1rem;
-                        padding: 1rem;
+                        padding: 1.5rem;
                     }
 
                     .header-section {
@@ -316,7 +332,6 @@ const SyncSettings = () => {
 
                     .action-button {
                         width: 100%;
-                        justify-content: center;
                     }
                 }
             `}</style>

@@ -1,17 +1,49 @@
 /* src/App.css */
 :root {
+    /* Light theme variables */
     --primary-blue: rgb(35, 106, 242);
     --primary-blue-hover: rgb(25, 86, 222);
     --dark-blue: rgb(3, 11, 46);
+    --bg-color: #f4f7f9;
+    --text-color: #333;
+    --nav-bg: var(--dark-blue);
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --card-bg: white;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --input-bg: white;
+    --input-border: #ddd;
+    --modal-bg: white;
+    --table-header-bg: var(--dark-blue);
+    --table-header-color: white;
+    --table-row-hover: rgba(35, 106, 242, 0.05);
+}
+
+/* Dark theme variables */
+.dark-mode {
+    --bg-color: #09122c;
+    --text-color: #ffffff;
+    --nav-bg: #2d2d2d;
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --card-bg: #2d2d2d;
+    --border-color: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --input-bg: #404040;
+    --input-border: #505050;
+    --modal-bg: #2d2d2d;
+    --table-header-bg: #2d2d2d;
+    --table-header-color: #ffffff;
+    --table-row-hover: rgba(255, 255, 255, 0.05);
 }
 
 * {
     font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 body {
-    background-color: #f4f7f9;
-    color: #333;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
 }
 
@@ -39,10 +71,10 @@ main {
 .table-container {
     width: 90%;
     margin: 0 auto;
-    background: white;
+    background: var(--card-bg);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px var(--shadow-color);
     overflow-x: auto; /* Enable horizontal scrolling for tables */
 }
 
@@ -67,12 +99,12 @@ th, td {
 }
 
 th {
-    background-color: var(--dark-blue);
-    color: white;
+    background-color: var(--table-header-bg);
+    color: var(--table-header-color);
 }
 
 tr:hover {
-    background-color: rgba(35, 106, 242, 0.05);
+    background-color: var(--table-row-hover);
 }
 
 /* Button Styles */
@@ -145,16 +177,18 @@ button:hover {
     justify-content: center;
     align-items: center;
     padding: 1rem;
+    z-index: 1000;
 }
 
 .modal-content {
-    background: white;
+    background: var(--modal-bg);
     padding: 2rem;
     border-radius: 8px;
     width: 100%;
     max-width: 400px;
     position: relative;
     box-shadow: 0 4px 12px rgba(35, 106, 242, 0.15);
+    color: var(--text-color);
 }
 
 .modal-close {
@@ -162,9 +196,37 @@ button:hover {
     top: 10px;
     right: 10px;
     background: none;
-    color: #333;
+    color: var(--text-color);
     border: none;
     font-size: 20px;
+    cursor: pointer;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: auto;
+}
+
+.checkbox-container label {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.cancel-btn {
+    background-color: transparent !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
+}
+
+.cancel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Form Styles */
@@ -177,10 +239,12 @@ form {
 form input {
     padding: 10px;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border);
     transition: border-color 0.2s;
     width: 100%;
     box-sizing: border-box;
+    background-color: var(--input-bg);
+    color: var(--text-color);
 }
 
 form input:focus {
@@ -635,38 +699,31 @@ form input:focus {
         padding: 1rem;
         margin-bottom: 1.5rem; /* Slightly less space on mobile */
     }
-}
 
-@media screen and (max-width: 480px) {
-    .App-header {
-        padding: 15px;
+    /* Dark mode specific styles for student table ONLY IN MOBILE VIEW */
+    .dark-mode .mobile-view .student-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
     }
 
-    .table-container {
-        padding: 0.5rem;
+    .dark-mode .mobile-view .student-card .student-name {
+        color: var(--text-color);
     }
 
-    th, td {
-        padding: 8px 10px;
-        font-size: 14px;
+    .dark-mode .mobile-view .student-card .student-rating {
+        color: #aaa;
     }
 
-    .actions-cell button {
-        width: 32px;
-        height: 32px;
+    .dark-mode .mobile-view .card-expanded-content {
+        border-top: 1px solid var(--border-color);
     }
 
-    .actions-cell button i {
-        font-size: 14px;
+    .dark-mode .mobile-view .card-expanded-content p {
+        color: var(--text-color);
     }
 
-    .modal-content {
-        padding: 1rem;
-    }
-
-    .chart-container {
-        height: 350px;
-        padding: 0.5rem;
+    .dark-mode .mobile-view .student-card.expanded {
+        background-color: rgba(255, 255, 255, 0.05);
     }
 }
 
@@ -1082,6 +1139,130 @@ form input:focus {
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem; /* Add space between navbar and content */
+}
+
+/* ...existing code... */
+
+/* Navbar styling - ensure elements are white regardless of theme */
+.navbar {
+    background-color: var(--nav-bg);
+    color: white !important; /* Force white text */
+}
+
+.nav-brand .brand-text {
+    color: white !important; /* Force white text */
+}
+
+.nav-links .theme-toggle,
+.nav-links .nav-link {
+    color: white !important; /* Force white text */
+}
+
+.nav-links .theme-toggle:hover,
+.nav-links .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* White with transparency */
+    color: white !important;
+}
+
+/* Force icon colors to white in the navbar */
+.navbar .fas {
+    color: white !important;
+}
+
+/* ...existing code... */
+
+/* Dark mode specific styles for charts */
+.dark-mode .chart-container {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+.dark-mode .profile-container {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.dark-mode .profile-section {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dark-mode .stat-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dark-mode .reminder-settings {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dark-mode .problem-link {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.dark-mode .problem-link:hover {
+  background-color: var(--hover-bg);
+}
+
+.dark-mode .filter-buttons button {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background-color: var(--card-bg);
+}
+
+.dark-mode .filter-select {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-color: var(--primary-blue);
+}
+
+/* Chart Styles - for consistency across graphs */
+.chart-container canvas {
+  filter: brightness(1);
+}
+
+.dark-mode .chart-container canvas {
+  filter: brightness(1.1);
+}
+
+/* Update the colors for filter buttons to match the graph colors */
+.filter-buttons button.active {
+  background-color: rgba(153, 102, 255, 0.8);
+  color: white;
+}
+
+.dark-mode .filter-buttons button.active {
+  background-color: rgba(153, 102, 255, 0.8);
+  color: white;
+}
+
+/* Dark mode specific styles for student table in mobile view */
+.dark-mode .mobile-view .student-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.dark-mode .mobile-view .student-card .student-name {
+  color: var(--text-color);
+}
+
+.dark-mode .mobile-view .student-card .student-rating {
+  color: #aaa;
+}
+
+.dark-mode .mobile-view .card-expanded-content {
+  border-top: 1px solid var(--border-color);
+}
+
+.dark-mode .mobile-view .card-expanded-content p {
+  color: var(--text-color);
+}
+
+.dark-mode .mobile-view .student-card.expanded {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* ...existing code... */

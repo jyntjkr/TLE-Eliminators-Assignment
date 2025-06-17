@@ -43,13 +43,19 @@ const EditStudentModal = ({ student, onSave, onCancel }) => {
                     <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
                     <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" />
                     <input name="codeforcesHandle" value={formData.codeforcesHandle} onChange={handleChange} placeholder="Codeforces Handle" required />
-                    <label>
-                        <input type="checkbox" name="disableEmail" checked={formData.disableEmail} onChange={handleChange} />
-                        Disable Inactivity Reminder Emails
-                    </label>
+                    <div className="checkbox-container">
+                        <input 
+                            type="checkbox" 
+                            id="disableEmail" 
+                            name="disableEmail" 
+                            checked={formData.disableEmail} 
+                            onChange={handleChange} 
+                        />
+                        <label htmlFor="disableEmail">Disable Inactivity Reminder Emails</label>
+                    </div>
                     <div className="form-actions">
                         <button type="submit">Update Student</button>
-                        <button type="button" onClick={onCancel}>Cancel</button>
+                        <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
                     </div>
                 </form>
             </div>

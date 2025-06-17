@@ -34,11 +34,12 @@ const StudentForm = ({ student, onSave, onCancel }) => {
         email: student ? student.email : '',
         phone: student ? student.phone : '',
         codeforcesHandle: student ? student.codeforcesHandle : '',
+        disableEmail: student ? student.disableEmail || false : false,
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
     
     const handleSubmit = (e) => {
@@ -52,9 +53,23 @@ const StudentForm = ({ student, onSave, onCancel }) => {
             <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email" required />
             <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" />
             <input name="codeforcesHandle" value={formData.codeforcesHandle} onChange={handleChange} placeholder="Codeforces Handle" required />
+            
+            {student && (
+                <div className="checkbox-container">
+                    <input 
+                        type="checkbox" 
+                        id="disableEmail" 
+                        name="disableEmail" 
+                        checked={formData.disableEmail} 
+                        onChange={handleChange} 
+                    />
+                    <label htmlFor="disableEmail">Disable Inactivity Reminder Emails</label>
+                </div>
+            )}
+            
             <div className="form-actions">
-                <button type="submit">Save</button>
-                <button type="button" onClick={onCancel}>Cancel</button>
+                <button type="submit">{student ? 'Update Student' : 'Save Student'}</button>
+                <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
             </div>
         </form>
     );
@@ -371,7 +386,7 @@ const StudentTable = () => {
                 }
 
                 .modal-content {
-                    background: white;
+                    background: var(--modal-bg);
                     padding: 2rem;
                     border-radius: 8px;
                     width: 100%;
@@ -380,6 +395,7 @@ const StudentTable = () => {
                     box-shadow: 0 4px 12px rgba(35, 106, 242, 0.15);
                     margin: auto;
                     transform: translateY(0);
+                    color: var(--text-color);
                 }
 
                 .modal-close {
@@ -390,7 +406,7 @@ const StudentTable = () => {
                     border: none;
                     font-size: 1.5rem;
                     cursor: pointer;
-                    color: #666;
+                    color: var(--text-color);
                     padding: 0.5rem;
                     line-height: 1;
                     display: flex;
@@ -406,10 +422,10 @@ const StudentTable = () => {
                     background-color: rgba(0, 0, 0, 0.1);
                 }
 
-                .modal-content h3 {
+                .modal-content h2 {
                     margin-top: 0;
                     margin-bottom: 1.5rem;
-                    color: var(--dark-blue);
+                    color: var(--text-color);
                     font-size: 1.5rem;
                 }
 
@@ -419,20 +435,38 @@ const StudentTable = () => {
                     gap: 1rem;
                 }
 
+                .checkbox-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+
+                .checkbox-container input[type="checkbox"] {
+                    width: auto;
+                    margin-right: 0.5rem;
+                }
+
+                .checkbox-container label {
+                    color: var(--text-color);
+                    font-size: 0.9rem;
+                }
+
                 .modal-content label {
                     display: block;
                     margin-bottom: 0.5rem;
-                    color: #333;
+                    color: var(--text-color);
                     font-weight: 500;
                 }
 
                 .modal-content input {
                     width: 100%;
                     padding: 0.75rem;
-                    border: 1px solid #ddd;
+                    border: 1px solid var(--input-border);
                     border-radius: 4px;
                     font-size: 1rem;
                     transition: border-color 0.2s;
+                    background-color: var(--input-bg);
+                    color: var(--text-color);
                 }
 
                 .modal-content input:focus {
@@ -462,10 +496,10 @@ const StudentTable = () => {
                     background-color: var(--primary-blue-hover);
                 }
 
-                .modal-content button[type="button"] {
-                    background-color: #f5f5f5;
-                    color: #333;
-                    border: 1px solid #ddd;
+                .modal-content button.cancel-btn {
+                    background-color: transparent;
+                    color: var(--text-color);
+                    border: 1px solid var(--input-border);
                     padding: 0.75rem 1.5rem;
                     border-radius: 4px;
                     cursor: pointer;
@@ -473,8 +507,8 @@ const StudentTable = () => {
                     transition: background-color 0.2s;
                 }
 
-                .modal-content button[type="button"]:hover {
-                    background-color: #e5e5e5;
+                .modal-content button.cancel-btn:hover {
+                    background-color: rgba(0, 0, 0, 0.05);
                 }
 
                 @media (max-width: 768px) {
@@ -483,7 +517,7 @@ const StudentTable = () => {
                         margin: 1rem;
                     }
 
-                    .modal-content h3 {
+                    .modal-content h2 {
                         font-size: 1.25rem;
                         margin-bottom: 1rem;
                     }
