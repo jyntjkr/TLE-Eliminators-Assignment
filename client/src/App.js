@@ -42,13 +42,14 @@ function App() {
                     }
 
                     .navbar {
-                        background-color: #2196F3;
+                        background-color: var(--dark-blue);
                         padding: 1rem 2rem;
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
                         color: white;
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        margin-bottom: 2rem; /* Add space between navbar and content */
                     }
 
                     .nav-brand {
@@ -93,14 +94,16 @@ function App() {
                     }
 
                     .main-content {
-                        padding: 2rem;
-                        max-width: 1200px;
+                        padding: 0;
+                        width: 100%;
                         margin: 0 auto;
+                        box-sizing: border-box;
                     }
 
                     @media (max-width: 768px) {
                         .navbar {
                             padding: 1rem;
+                            margin-bottom: 1.5rem; /* Slightly less space on mobile */
                         }
 
                         .brand-text {

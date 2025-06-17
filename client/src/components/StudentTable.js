@@ -53,6 +53,7 @@ const StudentTable = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
+    const [expandedRows, setExpandedRows] = useState(new Set());
     const navigate = useNavigate();
 
     const fetchStudents = async () => {
@@ -118,6 +119,10 @@ const StudentTable = () => {
         document.body.removeChild(link);
     };
 
+    const toggleRowExpansion = (id) => {
+        setExpandedRows(new Set([id === Array.from(expandedRows)[0] ? null : id]));
+    };
+
     if (isLoading) return <p>Loading students...</p>;
 
     return (
@@ -135,30 +140,63 @@ const StudentTable = () => {
                     </button>
                 </div>
             </div>
-            <table className="student-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Codeforces Handle</th>
-                        <th>Current Rating</th>
-                        <th>Max Rating</th>
-                        <th>Last Updated</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.map(student => (
-                        <tr key={student._id}>
-                            <td>{student.name}</td>
-                            <td>{student.email}</td>
-                            <td>{student.phone}</td>
-                            <td>{student.codeforcesHandle}</td>
-                            <td>{student.currentRating}</td>
-                            <td>{student.maxRating}</td>
-                            <td>{format(new Date(student.lastDataSync), 'PPpp')}</td>
-                            <td className="actions-cell">
+            
+            {/* Desktop View */}
+            <div className="desktop-view">
+                <table className="student-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Codeforces Handle</th>
+                            <th>Current Rating</th>
+                            <th>Max Rating</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {students.map(student => (
+                            <tr key={student._id}>
+                                <td>{student.name}</td>
+                                <td>{student.email}</td>
+                                <td>{student.phone}</td>
+                                <td>{student.codeforcesHandle}</td>
+                                <td>{student.currentRating}</td>
+                                <td>{student.maxRating}</td>
+                                <td>{format(new Date(student.lastDataSync), 'PPpp')}</td>
+                                <td className="actions-cell">
+                                    <button onClick={() => navigate(`/student/${student._id}`)}>
+                                        <i className="fas fa-eye"></i>
+                                    </button>
+                                    <button onClick={() => { setEditingStudent(student); setIsModalOpen(true); }}>
+                                        <i className="fas fa-edit"></i>
+                                    </button>
+                                    <button onClick={() => handleDelete(student._id)} className="delete-btn">
+                                        <i className="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            
+            {/* Mobile View */}
+            <div className="mobile-view">
+                {students.map(student => (
+                    <div 
+                        key={student._id}
+                        className={`student-card ${expandedRows.has(student._id) ? 'expanded' : ''}`}
+                        onClick={() => toggleRowExpansion(student._id)}
+                    >
+                        <div className="card-main-content">
+                            <div className="student-info">
+                                <div className="student-name">{student.name}</div>
+                                <div className="student-rating">Rating: {student.currentRating || 'N/A'}</div>
+                            </div>
+                            <div className="actions-cell" onClick={e => e.stopPropagation()}>
                                 <button onClick={() => navigate(`/student/${student._id}`)}>
                                     <i className="fas fa-eye"></i>
                                 </button>
@@ -168,11 +206,22 @@ const StudentTable = () => {
                                 <button onClick={() => handleDelete(student._id)} className="delete-btn">
                                     <i className="fas fa-trash"></i>
                                 </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                            </div>
+                        </div>
+                        
+                        {expandedRows.has(student._id) && (
+                            <div className="card-expanded-content">
+                                <p><strong>Email:</strong> {student.email}</p>
+                                <p><strong>Handle:</strong> {student.codeforcesHandle}</p>
+                                <p><strong>Phone:</strong> {student.phone}</p>
+                                <p><strong>Max Rating:</strong> {student.maxRating}</p>
+                                <p><strong>Last Updated:</strong> {format(new Date(student.lastDataSync), 'PPpp')}</p>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+            
             {isModalOpen && (
                 <Modal onClose={() => { setIsModalOpen(false); setEditingStudent(null); }}>
                     <h2>{editingStudent ? 'Edit Student' : 'Add Student'}</h2>
@@ -180,6 +229,13 @@ const StudentTable = () => {
                 </Modal>
             )}
             <style jsx>{`
+                .student-table-container {
+                    padding: 0 2rem;
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    box-sizing: border-box;
+                }
+
                 .table-header {
                     display: flex;
                     justify-content: space-between;
@@ -203,6 +259,10 @@ const StudentTable = () => {
                 }
 
                 @media (max-width: 768px) {
+                    .student-table-container {
+                        padding: 0 1rem;
+                    }
+
                     .button-text {
                         display: none;
                     }
@@ -214,6 +274,57 @@ const StudentTable = () => {
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                    }
+
+                    .student-table thead {
+                        display: none;
+                    }
+
+                    .student-table tbody tr {
+                        display: block;
+                        margin-bottom: 1rem;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+
+                    .student-table tbody tr.expanded .mobile-expanded-content {
+                        display: block;
+                    }
+
+                    .student-table tbody td {
+                        display: block;
+                        padding: 0.5rem;
+                        text-align: right;
+                        position: relative;
+                    }
+
+                    .student-table tbody td::before {
+                        content: attr(data-label);
+                        position: absolute;
+                        left: 0;
+                        width: 50%;
+                        padding-left: 0.5rem;
+                        font-weight: bold;
+                        text-align: left;
+                    }
+
+                    .student-table tbody .actions-cell {
+                        text-align: center;
+                    }
+
+                    .student-table tbody .mobile-details {
+                        display: none;
+                    }
+
+                    .student-table tbody tr.expanded .mobile-details {
+                        display: block;
+                    }
+
+                    .mobile-expanded-content {
+                        display: none;
+                        padding: 0.5rem;
+                        background-color: #f9f9f9;
                     }
                 }
             `}</style>

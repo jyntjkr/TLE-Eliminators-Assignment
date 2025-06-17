@@ -182,7 +182,7 @@ const SyncSettings = () => {
                 }
 
                 input[type="checkbox"]:checked + .toggle-slider {
-                    background-color: #2196F3;
+                    background-color: var(--primary-blue); /* Match the button color */
                 }
 
                 input[type="checkbox"]:checked + .toggle-slider:before {
@@ -192,7 +192,7 @@ const SyncSettings = () => {
                 button {
                     width: 100%;
                     padding: 0.75rem;
-                    background-color: #2196F3;
+                    background-color: var(--primary-blue); /* Match the download button color */
                     color: white;
                     border: none;
                     border-radius: 4px;
@@ -202,7 +202,7 @@ const SyncSettings = () => {
                 }
 
                 button:hover {
-                    background-color: #1976D2;
+                    background-color: var(--primary-blue-hover); /* Hover state */
                 }
 
                 button:disabled {
@@ -238,4 +238,4 @@ const SyncSettings = () => {
     );
 };
 
-export default SyncSettings; 
+export default SyncSettings;

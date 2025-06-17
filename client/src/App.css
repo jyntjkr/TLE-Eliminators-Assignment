@@ -198,9 +198,14 @@ form input:focus {
 
 /* Profile Styles */
 .profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
     padding: 2rem;
+    background: white;
+    border-radius: 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: left;
+    box-sizing: border-box;
 }
 
 .profile-section {
@@ -217,11 +222,22 @@ form input:focus {
 }
 
 .chart-container {
+    position: relative;
+    height: 500px; /* Increased from 400px */
+    width: 100%;
     margin-top: 1rem;
-    padding: 1rem;
+    padding: 1.5rem;
     background: #f8f9fa;
     border-radius: 8px;
-    overflow-x: auto; /* Enable horizontal scrolling for charts */
+    overflow: hidden; /* Change from overflow-x: auto to overflow: hidden */
+    box-sizing: border-box;
+}
+
+.student-table-container {
+    padding: 0 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 /* Responsive Styles */
@@ -241,10 +257,14 @@ form input:focus {
 
     .profile-container {
         padding: 1rem;
+        width: 100%;
+        margin: 0;
+        box-sizing: border-box;
     }
 
     .profile-section {
         padding: 1rem;
+        overflow: hidden; /* Prevent overflow from child elements */
     }
 
     .modal-content {
@@ -262,6 +282,358 @@ form input:focus {
 
     .actions-cell {
         justify-content: center;
+    }
+
+    .student-table {
+        min-width: unset;
+        border: none;
+    }
+
+    .student-table thead {
+        display: none;
+    }
+
+    .student-table tbody tr {
+        display: block;
+        background: white;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
+
+    .mobile-row-content {
+        display: block;
+        width: 100%;
+    }
+
+    .mobile-main-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 0.25rem;
+    }
+
+    .student-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 1rem;
+    }
+
+    .student-rating {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0 !important;
+    }
+
+    .actions-cell button {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .student-table td {
+        display: none;
+    }
+
+    .student-table td.mobile-row-content,
+    .student-table td.mobile-details {
+        display: block;
+        padding: 0;
+        border: none;
+    }
+
+    .mobile-expanded-content {
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+        border-top: 1px solid #eee;
+    }
+
+    .mobile-expanded-content p {
+        margin: 0.5rem 0;
+        color: #444;
+    }
+
+    .hide-mobile {
+        display: none !important;
+    }
+
+    .student-table tbody td.primary-info,
+    .student-table tbody td.actions-cell,
+    .student-table tbody td.mobile-details {
+        display: block; /* Show only these cells */
+        padding: 0.5rem;
+        border: none;
+    }
+
+    .student-main-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .student-name {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: var(--dark-blue);
+    }
+
+    .student-rating {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .mobile-expanded-content {
+        padding: 0.75rem 0 0.25rem 0;
+        display: none;
+    }
+
+    .mobile-expanded-content p {
+        margin: 0 0 0.5rem 0;
+        color: #444;
+        text-align: left;
+    }
+
+    tr.expanded .mobile-expanded-content {
+        display: block;
+        border-top: 1px solid #eee;
+        margin-top: 0.5rem;
+    }
+
+    .actions-cell {
+        padding-top: 0.75rem !important;
+        justify-content: flex-start;
+    }
+
+    .hide-mobile {
+        display: none !important;
+    }
+
+    .mobile-details {
+        display: none;
+        padding: 0;
+    }
+
+    tr.expanded .mobile-details {
+        display: block;
+        padding-top: 1rem;
+        margin-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .mobile-expanded-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .mobile-expanded-content p {
+        margin: 0;
+    }
+
+    tr::after {
+        display: none;
+    }
+
+    tr.expanded::after {
+        display: none;
+    }
+
+    .student-table tr.expanded {
+        background-color: #f8f9fa;
+    }
+
+    .mobile-main-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 0.25rem;
+    }
+
+    .student-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .mobile-row-content,
+    .mobile-main-content {
+        border: none !important;
+    }
+
+    tr.expanded .mobile-expanded-content {
+        border-top: 1px solid #eee;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    /* Visibility Control */
+    .desktop-only {
+        display: none;
+    }
+    
+    .mobile-only {
+        display: block;
+    }
+    
+    /* Card Styles for Mobile View */
+    .student-cards {
+        width: 100%;
+    }
+    
+    .student-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 12px;
+        padding: 12px;
+        cursor: pointer;
+    }
+    
+    .card-main-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .student-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 1rem;
+    }
+    
+    .student-rating {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .card-expanded-content {
+        display: none;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+    }
+    
+    .card-expanded-content p {
+        margin: 6px 0;
+        color: #444;
+    }
+    
+    .student-card.expanded .card-expanded-content {
+        display: block;
+    }
+    
+    .student-card.expanded {
+        background-color: #f8f9fa;
+    }
+    
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .actions-cell button {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Mobile header buttons */
+    .button-text {
+        display: none;
+    }
+
+    .add-btn, .download-btn {
+        padding: 0.5rem;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Mobile-specific stat card styling */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .stat-card h4 {
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .stat-card p {
+        font-size: 1rem;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    .heatmap-container {
+        min-width: 900px;
+        padding: 15px 0;
+    }
+    
+    .react-calendar-heatmap .react-calendar-heatmap-small-text {
+        font-size: 6px;
+    }
+    
+    .react-calendar-heatmap rect {
+        height: 11px;
+        rx: 2px;
+    }
+
+    .chart-container {
+        height: 400px;
+        padding: 0.75rem;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .student-table-container {
+        padding: 0 1rem;
+    }
+
+    .navbar {
+        padding: 1rem;
+        margin-bottom: 1.5rem; /* Slightly less space on mobile */
     }
 }
 
@@ -291,16 +663,94 @@ form input:focus {
     .modal-content {
         padding: 1rem;
     }
+
+    .chart-container {
+        height: 350px;
+        padding: 0.5rem;
+    }
+}
+
+/* Desktop Table Styles */
+@media screen and (min-width: 769px) {
+    .student-table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 600px;
+    }
+
+    .student-table tr {
+        display: table-row;
+        border-bottom: 1px solid #ddd;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .student-table td, 
+    .student-table th {
+        display: table-cell;
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .student-table .mobile-details,
+    .student-table .mobile-row-content {
+        display: none;
+    }
+
+    .student-table td.hide-mobile {
+        display: table-cell;
+    }
+
+    .mobile-main-content,
+    .mobile-expanded-content,
+    .student-info,
+    .student-name,
+    .student-rating {
+        display: none;
+    }
+
+    /* Regular table styles */
+    .student-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    /* Fix actions cell alignment for desktop */
+    .desktop-view .actions-cell {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: nowrap;
+        width: 120px; /* Ensure consistent width */
+        border-bottom: none; /* Remove the bottom border */
+    }
+
+    .desktop-view .actions-cell button {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        flex: 0 0 auto;
+    }
+
+    /* Remove any table cell borders in action cells */
+    .desktop-view table td.actions-cell {
+        border-bottom: none;
+    }
 }
 
 /* src/App.css - Additions */
 
 .profile-container {
-    width: 80%;
-    margin: 2rem auto;
+    width: 100%;
+    margin: 0;
     background: white;
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: 0;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: left;
 }
@@ -335,8 +785,14 @@ form input:focus {
 
 .chart-container {
     position: relative;
-    height: 400px;
+    height: 500px; /* Increased from 400px */
     width: 100%;
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden; /* Change from overflow-x: auto to overflow: hidden */
+    box-sizing: border-box;
 }
 
 .stats-grid {
@@ -351,6 +807,7 @@ form input:focus {
     border-radius: 8px;
     border: 1px solid #eee;
 }
+
 .stat-card h4 {
     margin-top: 0;
     color: #3498db;
@@ -362,11 +819,269 @@ form input:focus {
 }
 
 /* Heatmap Customization */
-.heatmap-container {
-    padding: 1rem;
+.heatmap-outer-container {
+    width: 100%;
+    position: relative;
+    margin: 20px 0;
+    overflow: hidden;
 }
-.react-calendar-heatmap .color-github-0 { fill: #ebedf0; }
-.react-calendar-heatmap .color-github-1 { fill: #9be9a8; }
-.react-calendar-heatmap .color-github-2 { fill: #40c463; }
-.react-calendar-heatmap .color-github-3 { fill: #30a14e; }
-.react-calendar-heatmap .color-github-4 { fill: #216e39; }
+
+.heatmap-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.heatmap-container {
+    min-width: 750px;
+    padding: 10px 0;
+}
+
+/* Base heatmap styles */
+.react-calendar-heatmap {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.react-calendar-heatmap rect {
+    rx: 1.5px;
+    stroke: #f4f7f9;
+    stroke-width: 1px;
+    height: 10px;
+    width: 10px;
+}
+
+.react-calendar-heatmap .react-calendar-heatmap-month-labels {
+    font-size: 11px;
+    color: #767676;
+}
+
+.react-calendar-heatmap .react-calendar-heatmap-weekday-labels {
+    font-size: 10px;
+    color: #767676;
+}
+
+.react-calendar-heatmap-month-label {
+    fill: #767676;
+    font-size: 10px;
+}
+
+.react-calendar-heatmap-weekday-label {
+    fill: #767676;
+    font-size: 9px;
+}
+
+.color-github-0, .color-empty { fill: #ebedf0; }
+.color-github-1 { fill: #9be9a8; }
+.color-github-2 { fill: #40c463; }
+.color-github-3 { fill: #30a14e; }
+.color-github-4 { fill: #216e39; }
+
+@media screen and (max-width: 768px) {
+    /* ...existing code... */
+    
+    .heatmap-container {
+        min-width: 900px;
+        padding: 15px 0;
+    }
+    
+    .react-calendar-heatmap rect {
+        height: 10px;
+        width: 10px;
+    }
+    
+    .react-calendar-heatmap-weekday-label {
+        font-size: 10px;
+    }
+
+    .chart-container {
+        height: 400px;
+        padding: 0.75rem;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .student-table-container {
+        padding: 0 1rem;
+    }
+}
+
+/* Base Styles - Applied to both views */
+/* ...existing code for shared styles... */
+
+/* Desktop Visibility Control */
+.desktop-only {
+    display: table;
+}
+
+.mobile-only {
+    display: none;
+}
+
+/* Desktop/Mobile View Controls */
+.desktop-view {
+    display: block;
+}
+
+.mobile-view {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    /* Hide desktop, show mobile */
+    .desktop-view {
+        display: none;
+    }
+    
+    .mobile-view {
+        display: block;
+    }
+
+    /* Mobile Card Styles */
+    .student-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 12px;
+        padding: 12px;
+        cursor: pointer;
+    }
+    
+    .card-main-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .student-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 1rem;
+    }
+    
+    .student-rating {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .card-expanded-content {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eee;
+    }
+    
+    .card-expanded-content p {
+        margin: 6px 0;
+        color: #444;
+        text-align: left;
+    }
+    
+    .student-card.expanded {
+        background-color: #f8f9fa;
+    }
+    
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .actions-cell button {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Mobile header buttons */
+    .button-text {
+        display: none;
+    }
+
+    .add-btn, .download-btn {
+        padding: 0.5rem;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .heatmap-container {
+        min-width: 900px;
+        padding: 15px 0;
+    }
+    
+    .react-calendar-heatmap .react-calendar-heatmap-small-text {
+        font-size: 6px;
+    }
+    
+    .react-calendar-heatmap rect {
+        height: 11px;
+        rx: 2px;
+    }
+
+    /* Mobile-specific stat card styling */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .stat-card h4 {
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .stat-card p {
+        font-size: 1rem;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+}
+
+/* ...existing styles... */
+
+/* Fix the table header styles */
+.contests-table th {
+    background-color: var(--dark-blue);
+    color: white;
+    font-weight: 600;
+}
+
+/* Center main content in App.js */
+.main-content {
+    padding: 0;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* ...existing code... */
+
+.navbar {
+    background-color: var(--dark-blue);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem; /* Add space between navbar and content */
+}
+
+/* ...existing code... */

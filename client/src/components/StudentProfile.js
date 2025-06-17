@@ -188,14 +188,16 @@ const StudentProfile = () => {
                     )}
                 </div>
                 <div className="chart-container" style={{
-                    height: '400px',
+                    height: '500px', // Increased from 400px
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '100%',
-                    maxWidth: '800px',
+                    maxWidth: '1000px', // Increased from 800px
                     margin: '0 auto',
-                    padding: '1rem'
+                    padding: '1.5rem', // Increased padding for more space
+                    boxSizing: 'border-box',
+                    overflowX: 'hidden' // Prevent horizontal overflow
                 }}>
                     {filteredContests.length > 0 ? (
                         <Line 
@@ -333,7 +335,19 @@ const StudentProfile = () => {
                         </div>
                     )}
                 </div>
-                <div className="chart-container">
+                <div className="chart-container" style={{
+                    height: '500px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    maxWidth: '1000px',
+                    margin: '0 auto',
+                    padding: '1.5rem',
+                    backgroundColor: '#fafafa',
+                    boxSizing: 'border-box',
+                    overflowX: 'hidden' // Prevent horizontal overflow
+                }}>
                     {problemSolvingStats?.totalSolved > 0 ? (
                         <Bar 
                             data={problemSolvingStats.ratingBuckets} 
@@ -343,6 +357,10 @@ const StudentProfile = () => {
                                 plugins: {
                                     legend: {
                                         position: 'top',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Problems by Rating'
                                     }
                                 },
                                 scales: {
@@ -350,6 +368,16 @@ const StudentProfile = () => {
                                         beginAtZero: true,
                                         ticks: {
                                             precision: 0
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Problems Solved'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Problem Rating'
                                         }
                                     }
                                 }
@@ -377,8 +405,9 @@ const StudentProfile = () => {
             <style jsx>{`
                 .profile-container {
                     padding: 2rem;
-                    max-width: 1200px;
-                    margin: 0 auto;
+                    max-width: 100%;
+                    margin: 0;
+                    box-sizing: border-box;
                 }
 
                 .back-button {
@@ -435,9 +464,17 @@ const StudentProfile = () => {
                 }
 
                 .chart-container {
-                    border-radius: 8px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                    margin: 1rem auto;
+                    height: 500px; // Update this to match the inline style
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    margin: 0 auto;
+                    padding: 1.5rem;
+                    background-color: #fafafa; // Lighter background to make the chart stand out
+                    box-sizing: border-box;
+                    overflow-x: hidden; /* Prevent horizontal overflow */
+                    position: relative;
                 }
 
                 .stats-grid {
@@ -487,7 +524,8 @@ const StudentProfile = () => {
                 }
 
                 .contests-table th {
-                    background-color: #f8f9fa;
+                    background-color: var(--dark-blue, rgb(3, 11, 46));
+                    color: white;
                     font-weight: 600;
                 }
 
@@ -526,6 +564,7 @@ const StudentProfile = () => {
                 @media (max-width: 768px) {
                     .profile-container {
                         padding: 1rem;
+                        margin: 0;
                     }
 
                     .section-header {
@@ -550,6 +589,11 @@ const StudentProfile = () => {
                         font-size: 1.2rem;
                     }
 
+                    .stat-card h4 {
+                        font-size: 0.8rem;
+                        margin-bottom: 0.3rem;
+                    }
+
                     .contests-table {
                         font-size: 0.875rem;
                     }
@@ -569,7 +613,37 @@ const StudentProfile = () => {
                     }
 
                     .chart-container {
-                        height: 300px;
+                        height: 400px; // Still larger than before (was 300px)
+                        padding: 0.75rem;
+                        width: 100%;
+                        max-width: 100%; /* Ensure it doesn't exceed screen width */
+                        min-width: 0; /* Allow the container to shrink if needed */
+                        margin: 0; /* Remove margin that might cause overflow */
+                        overflow: hidden; /* Hide any overflow */
+                    }
+
+                    .stats-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 0.75rem;
+                    }
+
+                    .stat-card {
+                        padding: 0.75rem;
+                    }
+
+                    .stat-card p {
+                        font-size: 1rem;
+                    }
+
+                    .stat-card h4 {
+                        font-size: 0.8rem;
+                        margin-bottom: 0.3rem;
+                    }
+                }
+
+                @media (max-width: 480px) {
+                    .chart-container {
+                        height: 350px; /* Even smaller for very small screens */
                         padding: 0.5rem;
                     }
                 }
