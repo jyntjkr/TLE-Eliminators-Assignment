@@ -1,4 +1,20 @@
 // src/components/StudentProfile.js
+/**
+ * StudentProfile Component
+ * 
+ * Displays detailed information about a student including:
+ * - Basic information and Codeforces handle
+ * - Contest history with rating changes
+ * - Problem solving statistics
+ * - Email reminder settings
+ * - Activity heatmap
+ * 
+ * Features:
+ * - Responsive design with mobile view
+ * - Filterable contest and problem data
+ * - Interactive charts and graphs
+ * - Email reminder toggle functionality
+ */
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Bar, Line } from 'react-chartjs-2';
@@ -9,12 +25,15 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import studentService from '../services/studentService';
 import axios from 'axios';
 
+// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
+// Color constants for consistent styling
 const PRIMARY_BLUE = 'rgb(35, 106, 242)';
 const PRIMARY_BLUE_TRANSPARENT = 'rgba(35, 106, 242, 0.1)';
 
 const StudentProfile = () => {
+    // State management for student data and UI controls
     const [student, setStudent] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [contestFilter, setContestFilter] = useState(365);
@@ -24,6 +43,7 @@ const StudentProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
+    // Handle window resize for responsive design
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
@@ -33,6 +53,7 @@ const StudentProfile = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Fetch student data on component mount
     useEffect(() => {
         const fetchStudentData = async () => {
             setIsLoading(true);
@@ -47,6 +68,7 @@ const StudentProfile = () => {
         fetchStudentData();
     }, [id]);
 
+    // Filter contests based on selected time period
     const filteredContests = useMemo(() => {
         if (!student?.codeforcesData?.contests) return [];
         const now = new Date();
@@ -144,9 +166,10 @@ const StudentProfile = () => {
 
     }, [student, problemFilter]);
 
+    // Handle email reminder toggle
     const handleToggleReminders = async () => {
+        setIsUpdatingReminders(true);
         try {
-            setIsUpdatingReminders(true);
             const response = await axios.put(`http://localhost:5001/api/inactivity/toggle-reminders/${id}`, {
                 enabled: !student.emailRemindersEnabled
             });
@@ -155,11 +178,9 @@ const StudentProfile = () => {
                 emailRemindersEnabled: response.data.data.emailRemindersEnabled
             }));
         } catch (error) {
-            console.error('Failed to update reminder settings:', error);
-            alert('Failed to update reminder settings. Please try again.');
-        } finally {
-            setIsUpdatingReminders(false);
+            console.error('Error toggling reminders:', error);
         }
+        setIsUpdatingReminders(false);
     };
 
     if (isLoading) return <p>Loading profile...</p>;

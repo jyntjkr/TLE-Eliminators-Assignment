@@ -1,11 +1,23 @@
 // src/components/StudentTable.js
+/**
+ * StudentTable Component
+ * 
+ * Displays a list of all students with their basic information and provides functionality for:
+ * - Adding new students
+ * - Viewing detailed student profiles
+ * - Downloading student data as CSV
+ * - Responsive design with mobile view support
+ */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import studentService from '../services/studentService';
 import Papa from 'papaparse';
 import { format } from 'date-fns';
 
-// Simplified Modal for brevity
+/**
+ * Modal Component
+ * A reusable modal dialog for displaying forms and messages
+ */
 const Modal = ({ children, onClose }) => (
     <div className="modal-backdrop">
         <div className="modal-content">
@@ -49,13 +61,32 @@ const StudentForm = ({ student, onSave, onCancel }) => {
 };
 
 const StudentTable = () => {
+    // State management for students list and UI controls
     const [students, setStudents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
     const [expandedRows, setExpandedRows] = useState(new Set());
+    const [newStudent, setNewStudent] = useState({ name: '', codeforcesHandle: '' });
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const navigate = useNavigate();
 
+    // Handle window resize for responsive design
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Fetch students data on component mount
+    useEffect(() => {
+        fetchStudents();
+    }, []);
+
+    // Fetch all students from the API
     const fetchStudents = async () => {
         setIsLoading(true);
         try {
@@ -67,10 +98,6 @@ const StudentTable = () => {
         }
         setIsLoading(false);
     };
-
-    useEffect(() => {
-        fetchStudents();
-    }, []);
 
     const handleSaveStudent = async (studentData) => {
         try {
@@ -230,9 +257,8 @@ const StudentTable = () => {
             )}
             <style jsx>{`
                 .student-table-container {
-                    padding: 0 2rem;
-                    max-width: 1400px;
-                    margin: 0 auto;
+                    padding: 2rem;
+                    max-width: 100%;
                     box-sizing: border-box;
                 }
 
@@ -325,6 +351,162 @@ const StudentTable = () => {
                         display: none;
                         padding: 0.5rem;
                         background-color: #f9f9f9;
+                    }
+                }
+
+                /* Modal Styles */
+                .modal-backdrop {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                    padding: 1rem;
+                    box-sizing: border-box;
+                }
+
+                .modal-content {
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 8px;
+                    width: 100%;
+                    max-width: 400px;
+                    position: relative;
+                    box-shadow: 0 4px 12px rgba(35, 106, 242, 0.15);
+                    margin: auto;
+                    transform: translateY(0);
+                }
+
+                .modal-close {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    color: #666;
+                    padding: 0.5rem;
+                    line-height: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    transition: background-color 0.2s;
+                }
+
+                .modal-close:hover {
+                    background-color: rgba(0, 0, 0, 0.1);
+                }
+
+                .modal-content h3 {
+                    margin-top: 0;
+                    margin-bottom: 1.5rem;
+                    color: var(--dark-blue);
+                    font-size: 1.5rem;
+                }
+
+                .modal-content form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .modal-content label {
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    color: #333;
+                    font-weight: 500;
+                }
+
+                .modal-content input {
+                    width: 100%;
+                    padding: 0.75rem;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 1rem;
+                    transition: border-color 0.2s;
+                }
+
+                .modal-content input:focus {
+                    outline: none;
+                    border-color: var(--primary-blue);
+                }
+
+                .modal-content .form-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 1rem;
+                    margin-top: 1.5rem;
+                }
+
+                .modal-content button[type="submit"] {
+                    background-color: var(--primary-blue);
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    transition: background-color 0.2s;
+                }
+
+                .modal-content button[type="submit"]:hover {
+                    background-color: var(--primary-blue-hover);
+                }
+
+                .modal-content button[type="button"] {
+                    background-color: #f5f5f5;
+                    color: #333;
+                    border: 1px solid #ddd;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    transition: background-color 0.2s;
+                }
+
+                .modal-content button[type="button"]:hover {
+                    background-color: #e5e5e5;
+                }
+
+                @media (max-width: 768px) {
+                    .modal-content {
+                        padding: 1.5rem;
+                        margin: 1rem;
+                    }
+
+                    .modal-content h3 {
+                        font-size: 1.25rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .modal-content input {
+                        padding: 0.625rem;
+                        font-size: 0.9375rem;
+                    }
+
+                    .modal-content .form-actions {
+                        flex-direction: column;
+                        gap: 0.75rem;
+                    }
+
+                    .modal-content button {
+                        width: 100%;
+                        padding: 0.625rem;
+                    }
+
+                    .modal-close {
+                        top: 8px;
+                        right: 8px;
+                        font-size: 1.25rem;
                     }
                 }
             `}</style>

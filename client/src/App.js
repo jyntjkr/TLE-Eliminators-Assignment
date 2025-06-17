@@ -1,4 +1,8 @@
 // src/App.js
+/**
+ * Main application component that handles routing and layout structure.
+ * Sets up the navigation bar and main content area with routes for different pages.
+ */
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import StudentTable from './components/StudentTable';
@@ -10,16 +14,19 @@ function App() {
     return (
         <Router>
             <div className="app">
+                {/* Navigation bar with logo and main navigation links */}
                 <nav className="navbar">
                     <div className="nav-brand">
                         <img src="/logo.svg" alt="TLE Eliminators Logo" className="logo" />
                         <span className="brand-text">TLE Eliminators</span>
                     </div>
                     <div className="nav-links">
+                        {/* Link to student list page */}
                         <Link to="/" className="nav-link">
                             <span className="link-text">Students</span>
                             <i className="fas fa-users link-icon"></i>
                         </Link>
+                        {/* Link to sync settings page */}
                         <Link to="/sync-settings" className="nav-link">
                             <span className="link-text">Sync</span>
                             <i className="fas fa-sync link-icon"></i>
@@ -27,10 +34,14 @@ function App() {
                     </div>
                 </nav>
 
+                {/* Main content area with route definitions */}
                 <main className="main-content">
                     <Routes>
+                        {/* Route for student list table */}
                         <Route path="/" element={<StudentTable />} />
+                        {/* Route for individual student profile */}
                         <Route path="/student/:id" element={<StudentProfile />} />
+                        {/* Route for sync settings page */}
                         <Route path="/sync-settings" element={<SyncSettings />} />
                     </Routes>
                 </main>

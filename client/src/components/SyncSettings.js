@@ -1,9 +1,25 @@
+/**
+ * SyncSettings Component
+ * 
+ * Manages the synchronization settings for student data with Codeforces:
+ * - Configures automatic sync schedule (daily/weekly/monthly)
+ * - Sets sync time
+ * - Enables/disables automatic sync
+ * - Provides manual sync trigger
+ * 
+ * Features:
+ * - Real-time settings updates
+ * - Manual sync capability
+ * - Status feedback for sync operations
+ * - Responsive design
+ */
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const SyncSettings = () => {
+    // State management for sync settings and UI controls
     const [settings, setSettings] = useState({
-        cronTime: '0 2 * * *',
+        cronTime: '0 2 * * *',  // Default: 2 AM daily
         frequency: 'daily',
         isEnabled: true
     });
@@ -11,10 +27,12 @@ const SyncSettings = () => {
     const [message, setMessage] = useState('');
     const [syncing, setSyncing] = useState(false);
 
+    // Fetch current sync settings on component mount
     useEffect(() => {
         fetchSettings();
     }, []);
 
+    // Fetch current sync settings from the API
     const fetchSettings = async () => {
         try {
             const response = await axios.get('http://localhost:5001/api/sync/settings');
@@ -27,6 +45,7 @@ const SyncSettings = () => {
         }
     };
 
+    // Handle settings form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -41,6 +60,7 @@ const SyncSettings = () => {
         setLoading(false);
     };
 
+    // Trigger manual sync of all student data
     const handleManualSync = async () => {
         setSyncing(true);
         setMessage('Starting global sync...');
@@ -55,16 +75,19 @@ const SyncSettings = () => {
         setSyncing(false);
     };
 
+    // Convert time input to cron format
     const handleTimeChange = (e) => {
         const [hours, minutes] = e.target.value.split(':');
         const cronTime = `${minutes} ${hours} * * *`;
         setSettings(prev => ({ ...prev, cronTime }));
     };
 
+    // Update sync frequency
     const handleFrequencyChange = (e) => {
         setSettings(prev => ({ ...prev, frequency: e.target.value }));
     };
 
+    // Toggle sync enabled/disabled
     const handleToggle = () => {
         setSettings(prev => ({ ...prev, isEnabled: !prev.isEnabled }));
     };
