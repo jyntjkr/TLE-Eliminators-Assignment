@@ -1,12 +1,12 @@
 // src/components/StudentProfile.js
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import studentService from '../services/studentService';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import { format, differenceInDays } from 'date-fns';
 import RatingGraph from './RatingGraph';
 import SubmissionsHeatmap from './SubmissionsHeatmap';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import studentService from '../services/studentService';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
@@ -36,7 +36,7 @@ const StudentProfile = () => {
             setIsLoading(true);
             try {
                 const response = await studentService.getStudent(id);
-                setStudent(response.data);
+                setStudent(response.data.data);
             } catch (error) {
                 console.error("Failed to fetch student data:", error);
             }
@@ -46,18 +46,54 @@ const StudentProfile = () => {
     }, [id]);
 
     const filteredContests = useMemo(() => {
-        if (!student) return [];
+        if (!student?.codeforcesData?.contests) return [];
         const now = new Date();
-        return student.contestHistory
+        return student.codeforcesData.contests
             .filter(c => differenceInDays(now, new Date(c.ratingUpdateTimeSeconds * 1000)) <= contestFilter)
             .sort((a, b) => a.ratingUpdateTimeSeconds - b.ratingUpdateTimeSeconds);
     }, [student, contestFilter]);
 
+    const contestStats = useMemo(() => {
+        if (!student?.codeforcesData?.submissions || !filteredContests.length) return null;
+
+        return filteredContests.map(contest => {
+            // Get all submissions for this contest
+            const contestSubmissions = student.codeforcesData.submissions.filter(
+                sub => sub.problem.contestId === contest.contestId
+            );
+
+            // Get unique problems attempted
+            const attemptedProblems = new Set(
+                contestSubmissions.map(sub => sub.problem.index)
+            );
+
+            // Get solved problems
+            const solvedProblems = new Set(
+                contestSubmissions
+                    .filter(sub => sub.verdict === 'OK')
+                    .map(sub => sub.problem.index)
+            );
+
+            // Calculate unsolved problems
+            const unsolvedProblems = Array.from(attemptedProblems)
+                .filter(problem => !solvedProblems.has(problem));
+
+            return {
+                ...contest,
+                date: format(new Date(contest.ratingUpdateTimeSeconds * 1000), 'MMM d, yyyy'),
+                ratingChange: contest.newRating - contest.oldRating,
+                unsolvedProblems,
+                totalAttempted: attemptedProblems.size,
+                totalSolved: solvedProblems.size
+            };
+        });
+    }, [student, filteredContests]);
+
     const problemSolvingStats = useMemo(() => {
-        if (!student) return null;
+        if (!student?.codeforcesData?.submissions) return null;
         const now = new Date();
 
-        const solvedSubmissions = student.submissionHistory
+        const solvedSubmissions = student.codeforcesData.submissions
             .filter(sub => sub.verdict === 'OK')
             .filter(sub => differenceInDays(now, new Date(sub.creationTimeSeconds * 1000)) <= problemFilter);
 
@@ -152,8 +188,103 @@ const StudentProfile = () => {
                     )}
                 </div>
                 <div className="chart-container" style={{height: '400px'}}>
-                    {filteredContests.length > 0 ? <RatingGraph contestData={filteredContests} /> : <p>No contest data for this period.</p>}
+                    {filteredContests.length > 0 ? (
+                        <Line 
+                            data={{
+                                labels: filteredContests.map(c => 
+                                    format(new Date(c.ratingUpdateTimeSeconds * 1000), 'MMM d, yyyy')
+                                ),
+                                datasets: [
+                                    {
+                                        label: 'Rating',
+                                        data: filteredContests.map(c => c.newRating),
+                                        borderColor: 'rgb(75, 192, 192)',
+                                        tension: 0.1
+                                    }
+                                ]
+                            }}
+                            options={{
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Rating Progression'
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: false,
+                                        title: {
+                                            display: true,
+                                            text: 'Rating'
+                                        }
+                                    }
+                                }
+                            }}
+                        />
+                    ) : (
+                        <p>No contest data for this period.</p>
+                    )}
                 </div>
+                {contestStats && contestStats.length > 0 && (
+                    <div className="contests-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Contest</th>
+                                    <th>Rank</th>
+                                    <th>Rating Change</th>
+                                    <th>Solved/Attempted</th>
+                                    <th>Unsolved Problems</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {contestStats.map(contest => (
+                                    <tr key={contest.contestId}>
+                                        <td>{contest.date}</td>
+                                        <td>
+                                            <a 
+                                                href={`https://codeforces.com/contest/${contest.contestId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {contest.contestName}
+                                            </a>
+                                        </td>
+                                        <td>{contest.rank}</td>
+                                        <td className={contest.ratingChange >= 0 ? 'positive' : 'negative'}>
+                                            {contest.ratingChange >= 0 ? '+' : ''}{contest.ratingChange}
+                                        </td>
+                                        <td>{contest.totalSolved}/{contest.totalAttempted}</td>
+                                        <td>
+                                            {contest.unsolvedProblems.length > 0 ? (
+                                                <div className="unsolved-problems">
+                                                    {contest.unsolvedProblems.map(problem => (
+                                                        <a
+                                                            key={problem}
+                                                            href={`https://codeforces.com/contest/${contest.contestId}/problem/${problem}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="problem-link"
+                                                        >
+                                                            {problem}
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                'All solved'
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </section>
             
             <section className="profile-section">
@@ -230,7 +361,7 @@ const StudentProfile = () => {
 
             <section className="profile-section">
                 <h3>Submission Heatmap (Last Year)</h3>
-                <SubmissionsHeatmap submissions={student.submissionHistory} />
+                <SubmissionsHeatmap submissions={student.codeforcesData?.submissions || []} />
             </section>
 
             <style jsx>{`
@@ -328,6 +459,61 @@ const StudentProfile = () => {
                     font-weight: 600;
                 }
 
+                .contests-table {
+                    margin-top: 2rem;
+                    overflow-x: auto;
+                }
+
+                .contests-table table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 1rem;
+                }
+
+                .contests-table th,
+                .contests-table td {
+                    padding: 0.75rem;
+                    text-align: left;
+                    border-bottom: 1px solid #eee;
+                }
+
+                .contests-table th {
+                    background-color: #f8f9fa;
+                    font-weight: 600;
+                }
+
+                .contests-table tr:hover {
+                    background-color: #f8f9fa;
+                }
+
+                .positive {
+                    color: #28a745;
+                }
+
+                .negative {
+                    color: #dc3545;
+                }
+
+                .unsolved-problems {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+
+                .problem-link {
+                    display: inline-block;
+                    padding: 0.25rem 0.5rem;
+                    background-color: #f8f9fa;
+                    border-radius: 4px;
+                    color: #495057;
+                    text-decoration: none;
+                    font-size: 0.875rem;
+                }
+
+                .problem-link:hover {
+                    background-color: #e9ecef;
+                }
+
                 @media (max-width: 768px) {
                     .profile-container {
                         padding: 1rem;
@@ -353,6 +539,24 @@ const StudentProfile = () => {
 
                     .stat-card p {
                         font-size: 1.2rem;
+                    }
+
+                    .contests-table {
+                        font-size: 0.875rem;
+                    }
+
+                    .contests-table th,
+                    .contests-table td {
+                        padding: 0.5rem;
+                    }
+
+                    .unsolved-problems {
+                        gap: 0.25rem;
+                    }
+
+                    .problem-link {
+                        padding: 0.125rem 0.25rem;
+                        font-size: 0.75rem;
                     }
                 }
             `}</style>

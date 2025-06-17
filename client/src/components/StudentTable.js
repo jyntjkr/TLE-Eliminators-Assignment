@@ -59,9 +59,10 @@ const StudentTable = () => {
         setIsLoading(true);
         try {
             const response = await studentService.getAllStudents();
-            setStudents(response.data);
+            setStudents(response.data.data || []);
         } catch (error) {
             console.error('Failed to fetch students:', error);
+            setStudents([]);
         }
         setIsLoading(false);
     };
@@ -105,7 +106,7 @@ const StudentTable = () => {
             CodeforcesHandle: s.codeforcesHandle,
             CurrentRating: s.currentRating,
             MaxRating: s.maxRating,
-            LastUpdated: format(new Date(s.lastUpdated), 'yyyy-MM-dd HH:mm'),
+            LastUpdated: format(new Date(s.lastDataSync), 'yyyy-MM-dd HH:mm'),
         }));
         const csv = Papa.unparse(data);
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -120,23 +121,26 @@ const StudentTable = () => {
     if (isLoading) return <p>Loading students...</p>;
 
     return (
-        <div className="table-container">
-            <div className="table-actions">
-                <button onClick={() => { setEditingStudent(null); setIsModalOpen(true); }}>
-                    <i className="fas fa-plus"></i> Add Student
-                </button>
-                <button onClick={downloadCSV}>
-                    <i className="fas fa-download"></i> Download as CSV
-                </button>
+        <div className="student-table-container">
+            <div className="table-header">
+                <h2>Students</h2>
+                <div className="table-actions">
+                    <button onClick={() => setIsModalOpen(true)} className="add-btn">
+                        <i className="fas fa-plus"></i> Add Student
+                    </button>
+                    <button onClick={downloadCSV} className="download-btn">
+                        <i className="fas fa-download"></i> Download CSV
+                    </button>
+                </div>
             </div>
-            <table>
+            <table className="student-table">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>CF Handle</th>
-                        <th>Rating</th>
+                        <th>Codeforces Handle</th>
+                        <th>Current Rating</th>
                         <th>Max Rating</th>
                         <th>Last Updated</th>
                         <th>Actions</th>
@@ -151,7 +155,7 @@ const StudentTable = () => {
                             <td>{student.codeforcesHandle}</td>
                             <td>{student.currentRating}</td>
                             <td>{student.maxRating}</td>
-                            <td>{format(new Date(student.lastUpdated), 'PPpp')}</td>
+                            <td>{format(new Date(student.lastDataSync), 'PPpp')}</td>
                             <td className="actions-cell">
                                 <button onClick={() => navigate(`/student/${student._id}`)}>
                                     <i className="fas fa-eye"></i>

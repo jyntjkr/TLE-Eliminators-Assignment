@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const studentRoutes = require('./routes/studentRoutes');
 const codeforcesRoutes = require('./routes/codeforcesRoutes');
-const { startCronJob } = require('./controllers/cronController');
+const syncRoutes = require('./routes/sync');
+const cronJobs = require('./utils/cronJobs');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -27,7 +28,7 @@ app.use((req, res, next) => {
 });
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/student_management', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -38,6 +39,7 @@ mongoose.connect(process.env.MONGO_URI, {
 console.log('Registering routes...');
 app.use('/api/students', studentRoutes);
 app.use('/api/codeforces', codeforcesRoutes);
+app.use('/api/sync', syncRoutes);
 console.log('Routes registered.');
 
 // Error handling middleware
@@ -61,6 +63,10 @@ app.listen(PORT, () => {
     console.log('- GET /api/students/:id');
     console.log('- PUT /api/students/:id');
     console.log('- DELETE /api/students/:id');
-    // Initialize the scheduled job
-    startCronJob();
+    console.log('- POST /api/sync/trigger');
+    console.log('- GET /api/sync/settings');
+    console.log('- PUT /api/sync/settings');
+    
+    // Initialize cron jobs
+    cronJobs.initializeSyncJob();
 });

@@ -37,11 +37,12 @@ const studentSchema = new mongoose.Schema({
     codeforcesHandle: { type: String, required: true, unique: true },
     currentRating: { type: Number, default: 0 },
     maxRating: { type: Number, default: 0 },
-    lastUpdated: { type: Date, default: Date.now },
-    contestHistory: [contestSchema],
-    submissionHistory: [submissionSchema],
+    lastDataSync: { type: Date, default: null },
+    isDataSyncing: { type: Boolean, default: false },
     reminderSentCount: { type: Number, default: 0 },
     disableEmail: { type: Boolean, default: false }
+}, {
+    timestamps: true
 });
 
 // Drop existing indexes to avoid conflicts

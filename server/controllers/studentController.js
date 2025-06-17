@@ -1,85 +1,22 @@
 // controllers/studentController.js
 const Student = require('../models/Student');
-const { getCodeforcesData } = require('./codeforcesController');
-
-// Create a new student and fetch initial data
-exports.createStudent = async (req, res) => {
-    console.log('Creating student with data:', req.body);
-    const session = await Student.startSession();
-    session.startTransaction();
-    
-    try {
-        // First check if student exists
-        const existingStudent = await Student.findOne({ 
-            $or: [
-                { email: req.body.email }, 
-                { codeforcesHandle: req.body.codeforcesHandle }
-            ] 
-        }).session(session);
-        
-        if (existingStudent) {
-            console.log('Student already exists:', existingStudent);
-            await session.abortTransaction();
-            session.endSession();
-            return res.status(409).send({ 
-                message: 'A student with this email or Codeforces handle already exists.' 
-            });
-        }
-
-        // Create new student with basic info
-        const student = new Student({
-            name: req.body.name,
-            email: req.body.email,
-            phone: req.body.phone,
-            codeforcesHandle: req.body.codeforcesHandle
-        });
-
-        try {
-            // Fetch Codeforces data
-            console.log('Fetching Codeforces data for:', student.codeforcesHandle);
-            const initialData = await getCodeforcesData(student.codeforcesHandle);
-            console.log('Received Codeforces data:', initialData);
-            
-            // Update student with Codeforces data
-            Object.assign(student, initialData);
-            
-            // Save the complete student record
-            await student.save({ session });
-            await session.commitTransaction();
-            session.endSession();
-            
-            console.log('Student saved successfully:', student);
-            res.status(201).send(student);
-        } catch (error) {
-            console.error('Error fetching Codeforces data:', error);
-            // If Codeforces data fetch fails, still save the basic student info
-            await student.save({ session });
-            await session.commitTransaction();
-            session.endSession();
-            
-            res.status(201).send({
-                ...student.toObject(),
-                message: 'Student created but Codeforces data could not be fetched. Will be updated on next sync.'
-            });
-        }
-    } catch (error) {
-        console.error('Error in createStudent:', error);
-        await session.abortTransaction();
-        session.endSession();
-        res.status(500).send({ 
-            message: 'Error creating student.', 
-            error: error.message 
-        });
-    }
-};
+const CodeforcesData = require('../models/CodeforcesData');
+const syncService = require('../services/syncService');
 
 // Get all students
 exports.getAllStudents = async (req, res) => {
     try {
         const students = await Student.find({}).sort({ name: 1 });
-        res.send(students);
+        res.json({
+            success: true,
+            data: students
+        });
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching students',
+            error: error.message
+        });
     }
 };
 
@@ -88,50 +25,156 @@ exports.getStudentById = async (req, res) => {
     try {
         const student = await Student.findById(req.params.id);
         if (!student) {
-            return res.status(404).send();
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
         }
-        res.send(student);
+
+        // Get Codeforces data
+        const codeforcesData = await CodeforcesData.findOne({ studentId: student._id });
+        
+        res.json({
+            success: true,
+            data: {
+                ...student.toObject(),
+                codeforcesData
+            }
+        });
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching student',
+            error: error.message
+        });
+    }
+};
+
+// Create a new student
+exports.createStudent = async (req, res) => {
+    try {
+        const { name, email, phone, codeforcesHandle } = req.body;
+
+        // Check if student exists
+        const existingStudent = await Student.findOne({
+            $or: [
+                { email },
+                { codeforcesHandle }
+            ]
+        });
+
+        if (existingStudent) {
+            return res.status(409).json({
+                success: false,
+                message: 'A student with this email or Codeforces handle already exists'
+            });
+        }
+
+        // Create new student
+        const student = new Student({
+            name,
+            email,
+            phone,
+            codeforcesHandle
+        });
+
+        await student.save();
+
+        // Trigger initial data sync
+        syncService.syncStudentData(student._id).catch(error => {
+            console.error(`Initial sync failed for new student ${student.name}:`, error.message);
+        });
+
+        res.status(201).json({
+            success: true,
+            data: student,
+            message: 'Student created successfully. Data sync initiated.'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error creating student',
+            error: error.message
+        });
     }
 };
 
 // Update a student
 exports.updateStudent = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
+        const { id } = req.params;
+        const { name, email, phone, codeforcesHandle } = req.body;
+
+        const student = await Student.findById(id);
         if (!student) {
-            return res.status(404).send();
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
         }
 
         const oldHandle = student.codeforcesHandle;
         
-        // Update fields
-        Object.assign(student, req.body);
+        // Update student
+        student.name = name || student.name;
+        student.email = email || student.email;
+        student.phone = phone || student.phone;
+        student.codeforcesHandle = codeforcesHandle || student.codeforcesHandle;
+
         await student.save();
 
-        // If CF handle changed, fetch new data in real-time
-        if (req.body.codeforcesHandle && req.body.codeforcesHandle !== oldHandle) {
-            const newData = await getCodeforcesData(student.codeforcesHandle);
-            Object.assign(student, newData);
-            await student.save();
+        // If handle changed, trigger immediate sync
+        if (codeforcesHandle && codeforcesHandle !== oldHandle) {
+            console.log(`Codeforces handle changed for ${student.name}. Triggering immediate sync.`);
+            syncService.syncStudentData(id, true).catch(error => {
+                console.error(`Handle change sync failed for ${student.name}:`, error.message);
+            });
         }
 
-        res.send(student);
+        res.json({
+            success: true,
+            data: student,
+            message: codeforcesHandle !== oldHandle ? 
+                'Student updated successfully. Data sync initiated due to handle change.' : 
+                'Student updated successfully'
+        });
     } catch (error) {
-        res.status(400).send(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating student',
+            error: error.message
+        });
     }
 };
 
 // Delete a student
 exports.deleteStudent = async (req, res) => {
     try {
-        const student = await Student.findByIdAndDelete(req.params.id);
+        const { id } = req.params;
+
+        const student = await Student.findById(id);
         if (!student) {
-            return res.status(404).send();
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
         }
-        res.send({ message: 'Student deleted successfully.' });
+
+        // Delete associated Codeforces data
+        await CodeforcesData.deleteMany({ studentId: id });
+        
+        // Delete student
+        await Student.findByIdAndDelete(id);
+
+        res.json({
+            success: true,
+            message: 'Student deleted successfully'
+        });
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting student',
+            error: error.message
+        });
     }
 };
