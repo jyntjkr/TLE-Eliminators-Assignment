@@ -7,6 +7,7 @@ import RatingGraph from './RatingGraph';
 import SubmissionsHeatmap from './SubmissionsHeatmap';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import studentService from '../services/studentService';
+import axios from 'axios';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
@@ -19,6 +20,7 @@ const StudentProfile = () => {
     const [contestFilter, setContestFilter] = useState(365);
     const [problemFilter, setProblemFilter] = useState(30);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isUpdatingReminders, setIsUpdatingReminders] = useState(false);
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -142,6 +144,24 @@ const StudentProfile = () => {
 
     }, [student, problemFilter]);
 
+    const handleToggleReminders = async () => {
+        try {
+            setIsUpdatingReminders(true);
+            const response = await axios.put(`http://localhost:5001/api/inactivity/toggle-reminders/${id}`, {
+                enabled: !student.emailRemindersEnabled
+            });
+            setStudent(prev => ({
+                ...prev,
+                emailRemindersEnabled: response.data.data.emailRemindersEnabled
+            }));
+        } catch (error) {
+            console.error('Failed to update reminder settings:', error);
+            alert('Failed to update reminder settings. Please try again.');
+        } finally {
+            setIsUpdatingReminders(false);
+        }
+    };
+
     if (isLoading) return <p>Loading profile...</p>;
     if (!student) return <p>Could not load student profile.</p>;
 
@@ -149,7 +169,27 @@ const StudentProfile = () => {
         <div className="profile-container">
             <button className="back-button" onClick={() => navigate('/')}>&larr; Back to List</button>
             <h2>{student.name}'s Profile ({student.codeforcesHandle})</h2>
-            <p>Reminder Emails Sent: {student.reminderSentCount}</p>
+            
+            <div className="reminder-settings">
+                <div className="reminder-info">
+                    <p>Reminder Emails Sent: {student.reminderSentCount}</p>
+                    <p>Last Reminder: {student.lastReminderSent ? format(new Date(student.lastReminderSent), 'PPpp') : 'Never'}</p>
+                </div>
+                <div className="reminder-toggle">
+                    <label className="toggle-switch">
+                        <input
+                            type="checkbox"
+                            checked={student.emailRemindersEnabled}
+                            onChange={handleToggleReminders}
+                            disabled={isUpdatingReminders}
+                        />
+                        <span className="toggle-slider"></span>
+                    </label>
+                    <span className="toggle-label">
+                        {student.emailRemindersEnabled ? 'Email Reminders Enabled' : 'Email Reminders Disabled'}
+                    </span>
+                </div>
+            </div>
             
             <section className="profile-section">
                 <div className="section-header">
@@ -561,6 +601,83 @@ const StudentProfile = () => {
                     background-color: #e9ecef;
                 }
 
+                .reminder-settings {
+                    background: white;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    margin: 1rem 0;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .reminder-info {
+                    display: flex;
+                    gap: 2rem;
+                }
+
+                .reminder-info p {
+                    margin: 0;
+                    color: #666;
+                }
+
+                .reminder-toggle {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                }
+
+                .toggle-switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 60px;
+                    height: 34px;
+                }
+
+                .toggle-switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                .toggle-slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    transition: .4s;
+                    border-radius: 34px;
+                }
+
+                .toggle-slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 26px;
+                    width: 26px;
+                    left: 4px;
+                    bottom: 4px;
+                    background-color: white;
+                    transition: .4s;
+                    border-radius: 50%;
+                }
+
+                input:checked + .toggle-slider {
+                    background-color: #2196F3;
+                }
+
+                input:checked + .toggle-slider:before {
+                    transform: translateX(26px);
+                }
+
+                .toggle-label {
+                    font-size: 0.9rem;
+                    color: #666;
+                }
+
                 @media (max-width: 768px) {
                     .profile-container {
                         padding: 1rem;
@@ -638,6 +755,17 @@ const StudentProfile = () => {
                     .stat-card h4 {
                         font-size: 0.8rem;
                         margin-bottom: 0.3rem;
+                    }
+
+                    .reminder-settings {
+                        flex-direction: column;
+                        gap: 1rem;
+                        align-items: flex-start;
+                    }
+
+                    .reminder-info {
+                        flex-direction: column;
+                        gap: 0.5rem;
                     }
                 }
 

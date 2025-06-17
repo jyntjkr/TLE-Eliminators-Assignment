@@ -6,6 +6,8 @@ const cors = require('cors');
 const studentRoutes = require('./routes/studentRoutes');
 const codeforcesRoutes = require('./routes/codeforcesRoutes');
 const syncRoutes = require('./routes/sync');
+const emailTestRoutes = require('./routes/emailTestRoutes');
+const inactivityRoutes = require('./routes/inactivityRoutes');
 const cronJobs = require('./utils/cronJobs');
 
 const app = express();
@@ -40,6 +42,8 @@ console.log('Registering routes...');
 app.use('/api/students', studentRoutes);
 app.use('/api/codeforces', codeforcesRoutes);
 app.use('/api/sync', syncRoutes);
+app.use('/api/email-test', emailTestRoutes);
+app.use('/api/inactivity', inactivityRoutes);
 console.log('Routes registered.');
 
 // Error handling middleware
@@ -66,6 +70,13 @@ app.listen(PORT, () => {
     console.log('- POST /api/sync/trigger');
     console.log('- GET /api/sync/settings');
     console.log('- PUT /api/sync/settings');
+    console.log('- GET /api/email-test/test-setup');
+    console.log('- POST /api/email-test/send-test');
+    console.log('- GET /api/inactivity/stats');
+    console.log('- GET /api/inactivity/inactive');
+    console.log('- GET /api/inactivity/reminders/:id');
+    console.log('- PUT /api/inactivity/toggle-reminders/:id');
+    console.log('- POST /api/inactivity/test-reminder/:id');
     
     // Initialize cron jobs
     cronJobs.initializeSyncJob();

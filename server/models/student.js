@@ -40,7 +40,12 @@ const studentSchema = new mongoose.Schema({
     lastDataSync: { type: Date, default: null },
     isDataSyncing: { type: Boolean, default: false },
     reminderSentCount: { type: Number, default: 0 },
-    disableEmail: { type: Boolean, default: false }
+    disableEmail: { type: Boolean, default: false },
+    // New fields for inactivity tracking
+    lastSubmissionDate: { type: Date, default: null },
+    isInactive: { type: Boolean, default: false },
+    inactivityDetectedAt: { type: Date, default: null },
+    lastReminderSent: { type: Date, default: null }
 }, {
     timestamps: true
 });

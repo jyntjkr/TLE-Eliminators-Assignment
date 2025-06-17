@@ -2,6 +2,7 @@ const Student = require('../models/Student');
 const CodeforcesData = require('../models/CodeforcesData');
 const SyncSettings = require('../models/SyncSettings');
 const codeforcesService = require('./codeforcesService');
+const inactivityService = require('./inactivityService');
 
 class SyncService {
   async syncStudentData(studentId, forceSync = false) {
@@ -58,6 +59,9 @@ class SyncService {
         isDataSyncing: false
       });
 
+      // Check for inactivity
+      await inactivityService.checkInactivityForStudent(studentId, cfData.submissions);
+
       console.log(`Sync completed for student: ${student.name}`);
       return { success: true, message: 'Data synced successfully' };
 
@@ -90,6 +94,23 @@ class SyncService {
         { upsert: true }
       );
 
+      // Collect submissions data for inactivity processing
+      const studentsData = [];
+      for (const result of results) {
+        if (!result.error) {
+          const data = await this.getStudentCodeforcesData(result.studentId || result._id);
+          if (data) {
+            studentsData.push({
+              studentId: data.studentId,
+              submissions: data.submissions
+            });
+          }
+        }
+      }
+      
+      // Process inactivity for all students
+      await inactivityService.processInactivityForAllStudents(studentsData);
+
       console.log('Global sync completed');
       return results;
     } catch (error) {
@@ -109,4 +130,4 @@ class SyncService {
   }
 }
 
-module.exports = new SyncService(); 
+module.exports = new SyncService();

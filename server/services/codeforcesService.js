@@ -80,4 +80,4 @@ class CodeforcesService {
   }
 }
 
-module.exports = new CodeforcesService(); 
+module.exports = new CodeforcesService();

@@ -9,6 +9,7 @@ const SyncSettings = () => {
     });
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
+    const [syncing, setSyncing] = useState(false);
 
     useEffect(() => {
         fetchSettings();
@@ -40,6 +41,20 @@ const SyncSettings = () => {
         setLoading(false);
     };
 
+    const handleManualSync = async () => {
+        setSyncing(true);
+        setMessage('Starting global sync...');
+        try {
+            const response = await axios.post('http://localhost:5001/api/sync/trigger');
+            setMessage('Global sync completed successfully');
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error) {
+            console.error('Error triggering global sync:', error);
+            setMessage('Error during global sync');
+        }
+        setSyncing(false);
+    };
+
     const handleTimeChange = (e) => {
         const [hours, minutes] = e.target.value.split(':');
         const cronTime = `${minutes} ${hours} * * *`;
@@ -62,7 +77,17 @@ const SyncSettings = () => {
 
     return (
         <div className="sync-settings">
-            <h2>Sync Settings</h2>
+            <div className="header-section">
+                <h2>Sync Settings</h2>
+                <button 
+                    onClick={handleManualSync} 
+                    disabled={syncing}
+                    className="action-button sync-button"
+                >
+                    {syncing ? 'Syncing...' : 'Trigger Global Sync'}
+                </button>
+            </div>
+
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>
@@ -103,9 +128,11 @@ const SyncSettings = () => {
                     </label>
                 </div>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Saving...' : 'Save Settings'}
-                </button>
+                <div className="button-container">
+                    <button type="submit" disabled={loading} className="action-button">
+                        {loading ? 'Saving...' : 'Save Settings'}
+                    </button>
+                </div>
 
                 {message && (
                     <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
@@ -116,7 +143,7 @@ const SyncSettings = () => {
 
             <style jsx>{`
                 .sync-settings {
-                    max-width: 500px;
+                    max-width: 600px;
                     margin: 2rem auto;
                     padding: 2rem;
                     background: white;
@@ -124,8 +151,15 @@ const SyncSettings = () => {
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
 
+                .header-section {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 2rem;
+                }
+
                 h2 {
-                    margin-bottom: 1.5rem;
+                    margin: 0;
                     color: #333;
                 }
 
@@ -182,32 +216,50 @@ const SyncSettings = () => {
                 }
 
                 input[type="checkbox"]:checked + .toggle-slider {
-                    background-color: var(--primary-blue); /* Match the button color */
+                    background-color: var(--primary-blue);
                 }
 
                 input[type="checkbox"]:checked + .toggle-slider:before {
                     transform: translateX(26px);
                 }
 
-                button {
-                    width: 100%;
-                    padding: 0.75rem;
-                    background-color: var(--primary-blue); /* Match the download button color */
-                    color: white;
+                .button-container {
+                    display: flex;
+                    justify-content: flex-start;
+                    margin-top: 1rem;
+                }
+
+                .action-button {
+                    padding: 0.5rem 1rem;
                     border: none;
                     border-radius: 4px;
-                    font-size: 1rem;
+                    font-size: 0.9rem;
                     cursor: pointer;
                     transition: background-color 0.3s;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    background-color: #4a90e2;
+                    color: white;
+                    min-width: 120px;
+                    justify-content: center;
                 }
 
-                button:hover {
-                    background-color: var(--primary-blue-hover); /* Hover state */
+                .action-button:hover {
+                    background-color: #357abd;
                 }
 
-                button:disabled {
+                .action-button:disabled {
                     background-color: #ccc;
                     cursor: not-allowed;
+                }
+
+                .sync-button {
+                    background-color: #4CAF50;
+                }
+
+                .sync-button:hover {
+                    background-color: #45a049;
                 }
 
                 .message {
@@ -231,6 +283,17 @@ const SyncSettings = () => {
                     .sync-settings {
                         margin: 1rem;
                         padding: 1rem;
+                    }
+
+                    .header-section {
+                        flex-direction: column;
+                        gap: 1rem;
+                        align-items: stretch;
+                    }
+
+                    .action-button {
+                        width: 100%;
+                        justify-content: center;
                     }
                 }
             `}</style>
