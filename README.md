@@ -2,6 +2,11 @@
 
 This documentation provides an in-depth look at the Student Progress Management System project. It covers the overall architecture, core functionalities, technologies used, data flow, and key modules across both the server and client sides.
 
+Here is an explanatory video:
+
+[![Student Progress Management System](/client/public/thumbnail.png)](https://youtu.be/vCzIq5r4hY4?feature=shared)
+
+
 ## Table of Contents
 - [Overview](#overview)
 - [Architecture & Technologies](#architecture--technologies)
