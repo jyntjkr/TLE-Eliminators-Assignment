@@ -6,6 +6,8 @@ Here is an explanatory video:
 
 [![Student Progress Management System](/client/public/thumbnail.png)](https://youtu.be/vCzIq5r4hY4?feature=shared)
 
+Youtube Video Link: https://youtu.be/vCzIq5r4hY4?feature=shared
+
 
 ## Table of Contents
 - [Overview](#overview)
